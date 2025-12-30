@@ -1,0 +1,153 @@
+<div class="min-h-screen bg-background">
+    <!-- Header -->
+    <header class="bg-surface shadow-surface border-b border-primary-100">
+        <div class="px-6 py-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-heading font-semibold text-text-primary">Customer Search</h1>
+                    <p class="text-text-secondary mt-1">Search and view customer financial details and history</p>
+                </div>
+                <div class="ml-auto">
+                    <table>
+                        <tr>
+                            <td class="px-6">
+                                <div class="text-right">
+                                    <p class="text-sm text-text-secondary">System Status</p>
+                                    <p class="text-sm font-medium text-success-700">Online</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-search text-primary text-sm"></i>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="p-6">
+        <!-- Search Section -->
+        <section class="mb-8">
+            <div class="card p-6 bg-white rounded-lg shadow-sm">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-search text-primary mr-3 text-xl"></i>
+                    <h2 class="text-xl font-heading font-semibold text-text-primary">Search Customer</h2>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label for="customerId" class="block text-sm font-medium text-text-secondary mb-2">Customer
+                            ID</label>
+                        <input type="text" id="customerId" [(ngModel)]="customerId" (keyup.enter)="searchCustomer()"
+                            placeholder="Enter customer ID (e.g., 7)" class="form-input w-full text-lg" pattern="[0-9]+"
+                            title="Please enter a valid customer ID (numbers only)">
+                        <p class="text-xs text-text-secondary mt-1">Enter a valid customer ID to retrieve financial
+                            details</p>
+                    </div>
+                    <div class="flex justify-end items-end">
+                        <button (click)="searchCustomer()" [disabled]="loading"
+                            class="btn-primary flex items-center px-6 py-3 text-lg font-medium">
+                            <i class="fas fa-search mr-2"></i>
+                            <span>{{ loading ? 'Searching...' : 'Search' }}</span>
+                            <i *ngIf="loading" class="fas fa-spinner fa-spin ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="error" class="mt-4 p-4 bg-error-100 border border-error-800 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-error-800 mr-2"></i>
+                        <span class="text-error-800 font-medium">{{ error }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section *ngIf="loading" class="card p-8 text-center mb-8">
+            <div class="loading-skeleton w-16 h-16 rounded-full mx-auto mb-4"></div>
+            <p class="text-text-secondary">Loading customer information...</p>
+        </section>
+
+        <!-- Customer Details Table -->
+        <section *ngIf="customer && !loading">
+            <div class="card bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="data-table w-full">
+                        <thead class="bg-primary-25">
+                            <tr>
+                                <th class="px-4 py-3 text-left">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="selectAll" aria-label="Select all customers"
+                                            class="form-checkbox">
+                                        <label for="selectAll" class="sr-only">Select all customers</label>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-3 text-left">Customer ID</th>
+                                <th class="px-4 py-3 text-left">Name</th>
+                                <th class="px-4 py-3 text-left">Address</th>
+                                <th class="px-4 py-3 text-left">Principal</th>
+                                <th class="px-4 py-3 text-left">Rate</th>
+                                <th class="px-4 py-3 text-left">Time</th>
+                                <th class="px-4 py-3 text-left">Interest Amount</th>
+                                <th class="px-4 py-3 text-left">Total Amount</th>
+                                <th class="px-4 py-3 text-left">Status</th>
+                                <th class="px-4 py-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-primary-100">
+                            <tr>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-data text-text-primary">{{ customer.id }}</td>
+                                <td class="px-4 py-3 text-sm font-medium text-text-primary">{{ customer.name }}</td>
+                                <td class="px-4 py-3 text-sm text-text-secondary">{{ customer.address }}</td>
+                                <td class="px-4 py-3 text-sm font-data text-text-primary">{{ customer.principal |
+                                    currency }}</td>
+                                <td class="px-4 py-3 text-sm font-data text-text-primary">{{ customer.interestRate }}%
+                                </td>
+                                <td class="px-4 py-3 text-sm font-data text-text-primary">{{ customer.timePeriod }} yrs
+                                </td>
+                                <td class="px-4 py-3 text-sm font-data text-text-primary">
+                                    {{ calculateInterest(customer.principal, customer.interestRate, customer.timePeriod)
+                                    | currency }}
+                                </td>
+                                <td class="px-4 py-3 text-sm font-data font-semibold text-success">
+                                    {{ calculateTotal(customer.principal, calculateInterest(customer.principal,
+                                    customer.interestRate, customer.timePeriod)) | currency }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span [ngClass]="getStatusClass(customer.status)"
+                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
+                                        {{ customer.status | titlecase }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center space-x-2">
+                                        <button class="text-primary" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="text-secondary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-error" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

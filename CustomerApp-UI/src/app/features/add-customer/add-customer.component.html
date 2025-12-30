@@ -1,0 +1,116 @@
+<div class="min-h-screen bg-background p-6">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-heading font-semibold text-text-primary">Add Customer Details Screen</h1>
+                <p class="text-text-secondary mt-1">Enter new customer information and loan details</p>
+            </div>
+            <a routerLink="/all-customers" class="btn-secondary text-lg">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to List
+            </a>
+        </div>
+
+        <!-- Form Card -->
+        <div class="card p-8">
+            <!-- Success Message -->
+            <div *ngIf="successMessage" class="success-message">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ successMessage }}</span>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Customer Name -->
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="name" class="block text-sm font-medium text-text-secondary mb-2">
+                            Customer Name <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="name" formControlName="name" class="form-input w-full"
+                            [ngClass]="{'border-error focus:ring-error': customerForm.get('name')?.invalid && customerForm.get('name')?.touched}"
+                            placeholder="Enter full name">
+                        <div *ngIf="customerForm.get('name')?.invalid && customerForm.get('name')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Customer Name is required.
+                        </div>
+                    </div>
+
+                    <!-- Customer Address -->
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="address" class="block text-sm font-medium text-text-secondary mb-2">
+                            Customer Address <span class="text-error">*</span>
+                        </label>
+                        <textarea id="address" formControlName="address" rows="3" class="form-input w-full"
+                            [ngClass]="{'border-error focus:ring-error': customerForm.get('address')?.invalid && customerForm.get('address')?.touched}"
+                            placeholder="Enter full address"></textarea>
+                        <div *ngIf="customerForm.get('address')?.invalid && customerForm.get('address')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Customer Address is required.
+                        </div>
+                    </div>
+
+                    <!-- Principal Amount -->
+                    <div>
+                        <label for="principal" class="block text-sm font-medium text-text-secondary mb-2">
+                            Principal Amount <span class="text-error">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="principal" formControlName="principal"
+                                class="form-input w-full pl-8"
+                                [ngClass]="{'border-error focus:ring-error': customerForm.get('principal')?.invalid && customerForm.get('principal')?.touched}"
+                                placeholder="0.00 $">
+                        </div>
+                        <div *ngIf="customerForm.get('principal')?.invalid && customerForm.get('principal')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Principal Amount is required.
+                        </div>
+                    </div>
+
+                    <!-- Interest Rate -->
+                    <div>
+                        <label for="interestRate" class="block text-sm font-medium text-text-secondary mb-2">
+                            Interest Rate %
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="interestRate" formControlName="interestRate"
+                                class="form-input w-full pr-8" placeholder="0.0">
+                            <span
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Time -->
+                    <div>
+                        <label for="timePeriod" class="block text-sm font-medium text-text-secondary mb-2">
+                            Time (Months)
+                        </label>
+                        <input type="number" id="timePeriod" formControlName="timePeriod" class="form-input w-full"
+                            placeholder="0">
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-end mt-8">
+                    <button type="button" routerLink="/all-customers" class="btn-secondary text-lg cancleBtn">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" [disabled]="customerForm.invalid || isSubmitting" class="btn-add-or-save">
+                        <i class="fas fa-save mr-2" *ngIf="!isSubmitting"></i>
+                        <i class="fas fa-spinner fa-spin mr-2" *ngIf="isSubmitting"></i>
+                        <span>{{ isSubmitting ? 'Saving...' : 'Add/Save' }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

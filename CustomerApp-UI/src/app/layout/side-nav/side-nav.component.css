@@ -1,0 +1,10 @@
+/* Force remove text decoration from links */
+a {
+    text-decoration: none !important;
+}
+
+/* Remove list styles */
+ul {
+    list-style-type: none !important;
+    padding-left: 0 !important;
+}

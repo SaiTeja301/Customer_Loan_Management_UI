@@ -1,0 +1,158 @@
+<div class="min-h-screen bg-background p-6">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-heading font-semibold text-text-primary">Update Customer Details</h1>
+                <p class="text-text-secondary mt-1">Modify existing customer information and financial details</p>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="card p-8">
+            <!-- Success Message -->
+            <div *ngIf="successMessage" class="success-message">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ successMessage }}</span>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Search Section (Hidden if ID provided) -->
+            <section *ngIf="!isIdProvided && !customer" class="mb-6 border-b border-gray-200 pb-6">
+                <form [formGroup]="searchForm" (ngSubmit)="loadCustomer()" class="flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label for="customerIdSearch"
+                            class="block text-sm font-medium text-text-secondary mb-2">Customer ID</label>
+                        <input type="text" id="customerIdSearch" formControlName="customerId" class="form-input w-full"
+                            placeholder="Enter ID">
+                    </div>
+                    <button type="submit" [disabled]="loading" class="btn-secondary text-lg mb-0.5">
+                        <i class="fas fa-download mr-2" *ngIf="!loading"></i>
+                        <span>{{ loading ? 'Loading...' : 'Load' }}</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Loading State -->
+            <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+                <p class="text-text-secondary text-lg">Loading customer details...</p>
+            </div>
+
+            <!-- Not Found State -->
+            <div *ngIf="!loading && isIdProvided && !customer && !errorMessage"
+                class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-search text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-heading font-semibold text-text-primary mb-2">No Data Found</h3>
+                <p class="text-text-secondary mb-6">Could not load customer information.</p>
+                <button type="button" (click)="onCancel()" class="btn-secondary text-lg">
+                    Go Back
+                </button>
+            </div>
+
+            <form *ngIf="customer" [formGroup]="updateForm" (ngSubmit)="onSubmit()">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Customer Name -->
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="fullName" class="block text-sm font-medium text-text-secondary mb-2">
+                            Customer Name <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="fullName" formControlName="fullName" class="form-input w-full"
+                            [ngClass]="{'border-error focus:ring-error': updateForm.get('fullName')?.invalid && updateForm.get('fullName')?.touched}"
+                            placeholder="Enter full name">
+                        <div *ngIf="updateForm.get('fullName')?.invalid && updateForm.get('fullName')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Full name is required (min 2 chars).
+                        </div>
+                    </div>
+
+                    <!-- Customer Address -->
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="address" class="block text-sm font-medium text-text-secondary mb-2">
+                            Customer Address <span class="text-error">*</span>
+                        </label>
+                        <textarea id="address" formControlName="address" rows="3" class="form-input w-full"
+                            [ngClass]="{'border-error focus:ring-error': updateForm.get('address')?.invalid && updateForm.get('address')?.touched}"
+                            placeholder="Enter full address"></textarea>
+                        <div *ngIf="updateForm.get('address')?.invalid && updateForm.get('address')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Address is required.
+                        </div>
+                    </div>
+
+                    <!-- Principal Amount -->
+                    <div>
+                        <label for="principalAmount" class="block text-sm font-medium text-text-secondary mb-2">
+                            Principal Amount <span class="text-error">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="principalAmount" formControlName="principalAmount"
+                                class="form-input w-full pl-8"
+                                [ngClass]="{'border-error focus:ring-error': updateForm.get('principalAmount')?.invalid && updateForm.get('principalAmount')?.touched}"
+                                placeholder="0.00">
+                            <span
+                                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary">$</span>
+                        </div>
+                        <div *ngIf="updateForm.get('principalAmount')?.invalid && updateForm.get('principalAmount')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Min amount 1000.
+                        </div>
+                    </div>
+
+                    <!-- Interest Rate -->
+                    <div>
+                        <label for="interestRate" class="block text-sm font-medium text-text-secondary mb-2">
+                            Interest Rate % <span class="text-error">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="interestRate" formControlName="interestRate"
+                                class="form-input w-full pr-8" placeholder="0.0">
+                            <span
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary">%</span>
+                        </div>
+                        <div *ngIf="updateForm.get('interestRate')?.invalid && updateForm.get('interestRate')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Min rate 0.1%.
+                        </div>
+                    </div>
+
+                    <!-- Time Period -->
+                    <div>
+                        <label for="timePeriod" class="block text-sm font-medium text-text-secondary mb-2">
+                            Time (Months) <span class="text-error">*</span>
+                        </label>
+                        <input type="number" id="timePeriod" formControlName="timePeriod" class="form-input w-full"
+                            [ngClass]="{'border-error focus:ring-error': updateForm.get('timePeriod')?.invalid && updateForm.get('timePeriod')?.touched}"
+                            placeholder="0">
+                        <div *ngIf="updateForm.get('timePeriod')?.invalid && updateForm.get('timePeriod')?.touched"
+                            class="mt-1 text-xs text-error">
+                            Min time 1 month.
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-end mt-8">
+                    <button type="button" (click)="onCancel()" class="btn-secondary text-lg cancleBtn">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" [disabled]="saving" class="btn-add-or-save">
+                        <i class="fas fa-save mr-2" *ngIf="!saving"></i>
+                        <i class="fas fa-spinner fa-spin mr-2" *ngIf="saving"></i>
+                        <span>{{ saving ? 'Saving...' : 'Update' }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

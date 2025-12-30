@@ -1,0 +1,56 @@
+<nav
+  class="fixed left-0 top-0 bottom-0 h-screen w-64 bg-primary shadow-modal z-50 transform transition-transform duration-300"
+  id="sidebar">
+  <div class="p-6">
+    <div class="flex items-center mb-8">
+      <img src="asserts/Images/image.png" alt="Logo" class="w-10 h-10 rounded-lg object-cover mr-3">
+      <div>
+        <h1 class="text-white font-heading font-semibold text-lg">Finance Manager</h1>
+        <p class="text-primary-300 text-sm">Customer Portal</p>
+      </div>
+    </div>
+
+    <ul class="space-y-2">
+      <li>
+        <a class='flex items-center px-4 py-3 text-primary-200 hover:text-white hover:bg-primary-700 rounded-lg transition-colors duration-200 no-underline'
+          routerLink='/get-customer-by-id' routerLinkActive="bg-primary-700 text-white"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i class="fas fa-search mr-3"></i>
+          <span>Get Customer by ID</span>
+        </a>
+      </li>
+      <li>
+        <a class='flex items-center px-4 py-3 text-primary-200 hover:text-white hover:bg-primary-700 rounded-lg transition-colors duration-200 no-underline'
+          routerLink='/all-customers' routerLinkActive="bg-primary-700 text-white">
+          <i class="fas fa-users mr-3"></i>
+          <span>All Customers</span>
+        </a>
+      </li>
+
+      <!-- Divider -->
+      <li class="my-4">
+        <div class="border-t border-primary-700"></div>
+      </li>
+
+      <!-- Ask Agent Link -->
+      <li>
+        <a class='flex items-center px-4 py-3 text-primary-200 hover:text-white hover:bg-primary-700 rounded-lg transition-colors duration-200 no-underline'
+          routerLink='/ask-agent' routerLinkActive="bg-primary-700 text-white">
+          <i class="fas fa-comments mr-3"></i>
+          <span>Ask Agent</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-primary-700">
+    <div class="flex items-center">
+      <img src="asserts/Images/Place_holder.png" alt="Financial advisor profile photo"
+        class="w-10 h-10 rounded-full object-cover mr-3">
+      <div>
+        <p class="text-white text-sm font-medium">Teja</p>
+        <p class="text-primary-300 text-xs">Financial Advisor</p>
+      </div>
+    </div>
+  </div>
+</nav>

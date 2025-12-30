@@ -1,0 +1,63 @@
+<div class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-heading font-bold text-text-primary">Ask Agent</h1>
+                    <p class="text-text-secondary">Customer Support Chat</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden" style="height: 600px;">
+
+            <!-- Messages Area -->
+            <div class="h-[500px] p-6 overflow-y-auto bg-gray-50 space-y-4" #scrollContainer
+                [scrollTop]="scrollContainer.scrollHeight">
+                <div *ngFor="let msg of messages()" class="flex" [class.justify-end]="msg.isUser">
+                    <div class="max-w-[70%] rounded-lg p-4 shadow-sm"
+                        [ngClass]="msg.isUser ? 'bg-primary text-white rounded-br-none' : 'bg-white text-text-primary border border-gray-200 rounded-bl-none'">
+                        <!-- Use innerHTML to render formatted text with newlines/bold from agent -->
+                        <div class="text-base whitespace-pre-line" [innerHTML]="msg.text"></div>
+                        <p class="text-xs mt-2 opacity-70" [class.text-primary-200]="msg.isUser"
+                            [class.text-text-secondary]="!msg.isUser">
+                            {{ msg.timestamp | date:'shortTime' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div *ngIf="isLoading()" class="flex justify-start">
+                    <div
+                        class="bg-white text-text-secondary border border-gray-200 rounded-lg rounded-bl-none p-4 shadow-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="h-[100px] p-6 bg-white border-t border-gray-200">
+                <div class="flex items-center gap-3">
+                    <input type="text" #messageInput
+                        (keyup.enter)="sendMessage(messageInput.value); messageInput.value=''"
+                        placeholder="Type your message..."
+                        class="flex-1 form-input border-gray-300 rounded-full px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent text-base"
+                        autocomplete="off">
+                    <button (click)="sendMessage(messageInput.value); messageInput.value=''"
+                        class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors shadow-md">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

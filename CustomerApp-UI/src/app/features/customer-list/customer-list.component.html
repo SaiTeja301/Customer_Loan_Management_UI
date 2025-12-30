@@ -1,0 +1,280 @@
+<div class="min-h-screen bg-background">
+  <!--Header -->
+  <header class="bg-surface shadow-surface border-b border-primary-100">
+    <div class="px-6 py-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-heading font-semibold text-text-primary">All Customers</h1>
+          <p class="text-text-secondary mt-1">Comprehensive customer portfolio management and financial tracking</p>
+        </div>
+        <div class="ml-auto">
+          <table>
+            <tr>
+              <td class="px-6">
+                <div class="text-right">
+                  <p class="text-sm text-text-secondary">Total Customers</p>
+                  <p class="text-lg font-data font-semibold text-primary" id="totalCustomers">{{customers.length}}</p>
+                </div>
+              </td>
+              <td>
+                <a routerLink="/add-customer" class="btn-primary flex items-center px-6 py-3" id="addCustomerBtn">
+                  <i class="fas fa-plus mr-2"></i>
+                  Add New Customer
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content area -->
+  <div class="p-6">
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <section class="mb-6">
+      <div class="card p-6">
+        <div class="flex items-center mb-4">
+          <i class="fas fa-filter text-primary mr-3 text-xl"></i>
+          <h2 class="text-xl font-heading font-semibold text-text-primary">Filter & Search</h2>
+          <div class="ml-auto flex items-center space-x-2">
+            <span class="text-sm text-text-secondary">Results:</span>
+            <span class="text-sm font-data font-semibold text-primary" id="resultsCount">{{customers.length}}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div>
+            <label for="searchInput" class="block text-sm font-medium text-text-secondary mb-2">Search Customers</label>
+            <div class="relative">
+              <input type="text" id="searchInput" [(ngModel)]="searchTerm" placeholder="Name, email, or ID..."
+                class="form-input w-full pl-10">
+            </div>
+          </div>
+
+          <div>
+            <label for="statusFilter" class="block text-sm font-medium text-text-secondary mb-2">Account Status</label>
+            <select id="statusFilter" [(ngModel)]="statusFilter" class="form-input w-full">
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="minPrincipal" class="block text-sm font-medium text-text-secondary mb-2">Min Principal</label>
+            <input type="text" id="minPrincipal" [(ngModel)]="minPrincipal" placeholder="e.g., 20000"
+              class="form-input w-full">
+          </div>
+
+          <div>
+            <label for="maxPrincipal" class="block text-sm font-medium text-text-secondary mb-2">Max Principal</label>
+            <input type="text" id="maxPrincipal" [(ngModel)]="maxPrincipal" placeholder="e.g., 100000"
+              class="form-input w-full">
+          </div>
+
+          <div>
+            <label for="maxInterestRate" class="block text-sm font-medium text-text-secondary mb-2">Max Interest
+              Rate</label>
+            <input type="text" id="maxInterestRate" [(ngModel)]="maxInterestRate" placeholder="e.g., 5"
+              class="form-input w-full">
+          </div>
+        </div>
+
+        <!-- Search Button -->
+        <div class="mt-6 flex justify-start gap-4">
+          <button (click)="searchCustomers()" [disabled]="allCustomers.length === 0"
+            [ngClass]="{'opacity-50 cursor-not-allowed': allCustomers.length === 0}" class="btn-primary">
+            <i class="fas fa-search mr-2"></i>
+            Search Customers
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card overflow-hidden">
+        <div class="bg-primary-50 px-6 py-4 border-b border-primary-100">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-heading font-semibold text-text-primary">Customer Portfolio</h3>
+            <div class="flex items-center space-x-2">
+              <div class="text-sm text-text-secondary">Last updated: <span id="lastUpdated">{{ lastUpdated ?
+                  (lastUpdated | date:'mediumTime') : '--' }}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="data-table w-full">
+            <thead class="bg-primary-25">
+              <tr>
+                <th class="px-2 py-3 text-left text-xs">
+                  <div class="flex items-center">
+                    <input type="checkbox" id="selectAll" class="form-checkbox" aria-label="Select all customers">
+                    <label for="selectAll" class="sr-only"></label>
+                  </div>
+                </th>
+                <th class="px-4 py-3 text-left text-xs">Customer ID</th>
+                <th class="px-4 py-3 text-left text-xs">Name</th>
+                <th class="px-4 py-3 text-left text-xs">Address</th>
+                <th class="px-4 py-3 text-left text-xs">Principal</th>
+                <th class="px-4 py-3 text-left text-xs">Rate</th>
+                <th class="px-4 py-3 text-left text-xs">Time</th>
+                <th class="px-4 py-3 text-left text-xs">Interest Amount</th>
+                <th class="px-4 py-3 text-left text-xs">Total Amount</th>
+                <th class="px-4 py-3 text-left text-xs">Status</th>
+                <th class="px-4 py-3 text-left text-xs">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customerTableBody" class="divide-y divide-primary-100">
+              <tr *ngFor="let customer of paginatedCustomers">
+                <td class="px-2 py-3">
+                  <div class="flex items-center">
+                    <input type="checkbox" [id]="'select-' + customer.id" class="form-checkbox"
+                      [attr.aria-label]="'Select ' + customer.name">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-xs font-data text-text-primary">{{customer.id}}</td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                      <span class="text-xs font-medium text-primary">{{customer.name.charAt(0)}}</span>
+                    </div>
+                    <div>
+                      <p class="text-xs font-medium text-text-primary">{{customer.name}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-xs text-text-primary">{{customer.address}}</td>
+                <td class="px-4 py-3 text-xs font-data text-text-primary">{{customer.principal | currency}}</td>
+                <td class="px-4 py-3 text-xs font-data text-text-primary">{{customer.interestRate}}%</td>
+                <td class="px-4 py-3 text-xs font-data text-text-primary">{{customer.timePeriod}} Months</td>
+                <td class="px-4 py-3 text-xs font-data text-text-primary">{{customer.interestAmount | currency}}</td>
+                <td class="px-4 py-3 text-xs font-data font-semibold text-success">
+                  {{customer.totalAmount | currency}}
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                          'bg-success-100 text-success-800': customer.status === 'active',
+                          'bg-error-100 text-error-800': customer.status === 'inactive',
+                          'bg-warning-100 text-warning-800': customer.status === 'pending'
+                        }">
+                    {{customer.status | titlecase}}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center space-x-2">
+                    <!-- <button class="text-primary" [title]="'View details for ' + customer.name"
+                      [attr.aria-label]="'View details for ' + customer.name">
+                      <i class="fas fa-eye" aria-hidden="true"></i>
+                      <span class="sr-only">View</span>
+                    </button> -->
+                    <button (click)="editCustomer(customer.id)" class="text-secondary action-btn"
+                      [title]="'Edit ' + customer.name" [attr.aria-label]="'Edit ' + customer.name">
+                      <i class="fas fa-edit" aria-hidden="true"></i>
+                      <span>Edit</span>
+                    </button>
+                    <button (click)="deleteCustomer(customer.id)" class="text-error action-btn"
+                      [title]="'Delete ' + customer.name" [attr.aria-label]="'Delete ' + customer.name">
+                      <i class="fas fa-trash" aria-hidden="true"></i>
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div *ngIf="customers.length > 0"
+          class="px-6 py-4 border-t border-primary-100 flex items-center justify-between">
+          <div class="text-sm text-text-secondary">
+            Showing {{(currentPage - 1) * pageSize + 1}} to {{currentPage * pageSize > customers.length ?
+            customers.length : currentPage * pageSize}} of {{customers.length}} results
+          </div>
+          <div class="flex items-center space-x-2">
+            <button (click)="previousPage()" [disabled]="currentPage === 1"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === 1}" class="pagination-btn">
+              <i class="fas fa-chevron-left"></i>
+              <span>Previous</span>
+            </button>
+            <div class="flex items-center space-x-1">
+              <span class="px-3 py-1 text-sm font-medium text-text-primary">
+                Page {{currentPage}} of {{totalPages}}
+              </span>
+            </div>
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === totalPages}" class="pagination-btn">
+              <span>Next</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:hidden" id="mobileCustomerCards">
+          <div class="p-4 border-b border-primary-100" *ngFor="let customer of customers">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                  <span class="text-sm font-medium text-primary">{{customer.name.charAt(0)}}</span>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-text-primary">{{customer.name}}</h3>
+                  <p class="text-xs text-text-secondary">ID: {{customer.id}}</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-success-100 text-success-800': customer.status === 'active',
+                      'bg-error-100 text-error-800': customer.status === 'inactive',
+                      'bg-warning-100 text-warning-800': customer.status === 'pending'
+                    }">
+                {{customer.status | titlecase}}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <p class="text-xs text-text-secondary">Principal</p>
+                <p class="text-sm font-data font-medium text-text-primary">{{customer.principal | currency}}</p>
+              </div>
+              <div>
+                <p class="text-xs text-text-secondary">Rate</p>
+                <p class="text-sm font-data font-medium text-text-primary">{{customer.interestRate}}%</p>
+              </div>
+              <div>
+                <p class="text-xs text-text-secondary">Time</p>
+                <p class="text-sm font-data font-medium text-text-primary">{{customer.timePeriod}} years</p>
+              </div>
+              <div>
+                <p class="text-xs text-text-secondary">Total</p>
+                <p class="text-sm font-data font-semibold text-success">
+                  {{customer.totalAmount | currency}}
+                </p>
+              </div>
+            </div>
+
+            <!-- Mobile Actions -->
+            <div class="flex justify-end space-x-3 mt-3 pt-3 border-t border-primary-50">
+              <button (click)="editCustomer(customer.id)" class="text-sm text-secondary flex items-center">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button (click)="deleteCustomer(customer.id)" class="text-sm text-error flex items-center">
+                <i class="fas fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
