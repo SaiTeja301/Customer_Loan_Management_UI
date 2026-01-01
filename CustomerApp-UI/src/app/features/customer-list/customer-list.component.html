@@ -173,7 +173,7 @@
                   </span>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="flex items-center space-x-2">
+                  <div class="flex items-center gap-3">
                     <!-- <button class="text-primary" [title]="'View details for ' + customer.name"
                       [attr.aria-label]="'View details for ' + customer.name">
                       <i class="fas fa-eye" aria-hidden="true"></i>
@@ -203,7 +203,7 @@
             Showing {{(currentPage - 1) * pageSize + 1}} to {{currentPage * pageSize > customers.length ?
             customers.length : currentPage * pageSize}} of {{customers.length}} results
           </div>
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center gap-6">
             <button (click)="previousPage()" [disabled]="currentPage === 1"
               [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === 1}" class="pagination-btn">
               <i class="fas fa-chevron-left"></i>

@@ -52,15 +52,15 @@ export class CustomerService {
       customerName: updatedCustomer.name,
       customerAddress: updatedCustomer.address,
       principalAmount: updatedCustomer.principal,
-      rate: updatedCustomer.interestRate,
+      interestRate: updatedCustomer.interestRate,
       time: updatedCustomer.timePeriod
     };
 
     const url = `${this.apiUrl}${ApiEndpoints.UPDATE_BY_ID}${updatedCustomer.id}`;
+
     console.log('Update API Call URL:', url);
     console.log('Update Payload:', payload);
 
-    // API returns text/plain response, not JSON (same as addCustomer)
     return this.http.put(url, payload, { responseType: 'text' }).pipe(
       map(() => updatedCustomer),
       tap(() => this.clearCache())
