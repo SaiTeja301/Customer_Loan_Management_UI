@@ -1,24 +1,29 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { CustomerService } from '../../services/customer.service';
 import { Customer } from '../../models/customer.model';
 
 @Component({
     selector: 'app-get-customer',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './get-customer.component.html',
     styleUrls: ['./get-customer.component.css']
 })
 export class GetCustomerComponent {
     private customerService = inject(CustomerService);
+    private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
 
     customerId = '';
     customer: Customer | null = null;
     loading = false;
     error = '';
+    successMessage = '';
+    errorMessage = '';
+    private successMessageTimeout: any;
 
     searchCustomer() {
         if (!this.customerId) {
@@ -34,6 +39,8 @@ export class GetCustomerComponent {
         this.loading = true;
         this.error = '';
         this.customer = null;
+        this.successMessage = '';
+        this.errorMessage = '';
         this.cdr.detectChanges(); // Force update
 
         this.customerService.getCustomerById(this.customerId).subscribe({
@@ -48,38 +55,49 @@ export class GetCustomerComponent {
             },
             error: (err) => {
                 console.error('Error fetching customer:', err);
-                // Show friendly message for 404 (not found) or any other error
                 if (err.status === 404) {
                     this.error = `😞 No Record found With This Id: "${this.customerId}"`;
                 } else {
                     this.error = `Error: ${err.message || 'Backend not responding'}`;
                 }
                 this.loading = false;
-                this.cdr.detectChanges(); // Force update on error
+                this.cdr.detectChanges();
             }
         });
     }
 
-    calculateInterest(principal: number, rate: number, time: number): number {
-        return principal * (rate / 100) * time;
+    editCustomer(id: string) {
+        this.router.navigate(['/update-customer'], { queryParams: { id: id } });
     }
 
-    calculateTotal(principal: number, interest: number): number {
-        return principal + interest;
-    }
+    deleteCustomer(id: string) {
+        if (confirm('Are you sure you want to delete this customer?')) {
+            this.customerService.deleteCustomer(id).subscribe({
+                next: () => {
+                    console.log('[SUCCESS] deleteCustomer called from GetCustomer');
+                    this.successMessage = `Record deleted successfully with ID: ${id}`;
+                    this.errorMessage = '';
+                    this.customer = null; // Clear the record after deletion
+                    this.customerId = '';
 
-    getStatusClass(status: string): string {
-        switch (status.toLowerCase()) {
-            case 'completed':
-            case 'active':
-                return 'bg-success-100 text-success-800';
-            case 'processed':
-            case 'pending':
-                return 'bg-warning-100 text-warning-800';
-            case 'inactive':
-                return 'bg-error-100 text-error-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+                    // Auto-clear timer
+                    if (this.successMessageTimeout) {
+                        clearTimeout(this.successMessageTimeout);
+                    }
+                    this.successMessageTimeout = setTimeout(() => {
+                        this.successMessage = '';
+                        this.cdr.detectChanges();
+                    }, 5000);
+
+                    this.cdr.detectChanges();
+                },
+                error: (err) => {
+                    console.error('Error deleting customer', err);
+                    this.errorMessage = 'Failed to delete customer.';
+                    this.successMessage = '';
+                    this.cdr.detectChanges();
+                }
+            });
         }
     }
 }

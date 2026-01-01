@@ -177,10 +177,8 @@ export class UpdateCustomerComponent implements OnInit {
             principal: formValue.principalAmount,
             interestRate: formValue.interestRate,
             timePeriod: formValue.timePeriod,
-            // Only update derived fields if necessary, or let backend handle?
-            // Usually we shouldn't update 'derived' fields like interestAmount manually unless form logic did it
-            // calculateInterest() updates calculatedInterest/totalAmount properties but they are not in formValue
-            // We should arguably set them here if backend expects them
+            interestAmount: this.calculatedInterest,
+            totalAmount: this.totalAmount
         };
 
         // Ensure ID is set (safety check)
