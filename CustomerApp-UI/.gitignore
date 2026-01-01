@@ -1,0 +1,4 @@
+# Default ignored files for Angular
+.angular/
+dist/
+node_modules/
